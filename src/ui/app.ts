@@ -119,7 +119,7 @@ export function mountApp(root: HTMLElement): void {
   }
   function setBusy(busy: boolean): void {
     state.busy = busy;
-    if (busy) setStatus("Working…");
+    setStatus(busy ? "Working…" : "Ready.");
   }
 
   async function handleFiles(files: File[]): Promise<void> {
@@ -175,11 +175,13 @@ export function mountApp(root: HTMLElement): void {
 
       const optPanel = optionPanel as HTMLElement & { populateColumns?: (t: Table | null, isDiff: boolean) => void };
       optPanel.populateColumns?.(state.tableA, false);
-      setStatus(state.tableB ? "Two files loaded — switch to “Two files: compare / diff” to compare them." : "File loaded — choose an operation above.");
     } catch (err) {
       showError(err instanceof Error ? err.message : String(err));
     } finally {
       setBusy(false);
+      if (state.tableA) {
+        setStatus(state.tableB ? "Two files loaded — switch to “Two files: compare / diff” to compare them." : "File loaded — choose an operation above.");
+      }
     }
   }
 
@@ -210,6 +212,7 @@ export function mountApp(root: HTMLElement): void {
         `Remove ${p.dropIndices.length} duplicate row${p.dropIndices.length === 1 ? "" : "s"}? ${p.keepIndices.length} rows will remain. This only affects the downloaded file — your original is untouched.`,
         [{ label: "Download cleaned file", fileName: "tidysheet-deduped.csv" }]
       );
+      setStatus("Preview ready. Review the changes, then confirm to download.");
     } catch (err) {
       showError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -262,6 +265,7 @@ export function mountApp(root: HTMLElement): void {
           : `${changedCells} cell${changedCells === 1 ? "" : "s"} changed. Download the cleaned file?`,
         [{ label: "Download cleaned file", fileName: "tidysheet-cleaned.csv" }]
       );
+      setStatus(changedCells === 0 ? "No cells changed. You can still download." : `${changedCells} cell${changedCells === 1 ? "" : "s"} changed. Review and download.`);
     } catch (err) {
       showError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -310,6 +314,7 @@ export function mountApp(root: HTMLElement): void {
         `Comparison complete: ${diff.added.length} added, ${diff.removed.length} removed, ${diff.changed.length} changed, ${diff.unchangedCount} unchanged.`,
         [{ label: "Download change report", fileName: "tidysheet-diff-report.csv" }]
       );
+      setStatus(`Comparison complete: ${diff.added.length} added, ${diff.removed.length} removed, ${diff.changed.length} changed, ${diff.unchangedCount} unchanged.`);
     } catch (err) {
       showError(err instanceof Error ? err.message : String(err));
     } finally {
