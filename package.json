@@ -1,0 +1,24 @@
+{
+  "name": "tidysheet",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-first, no-signup CSV/TSV toolkit: dedupe, clean, and key-based diff. Nothing uploaded.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "tsx --test tests/*.test.ts",
+    "test:watch": "tsx --test --watch tests/*.test.ts"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "papaparse": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.3.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0"
+  }
+}

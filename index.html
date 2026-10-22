@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'" />
+    <title>TidySheet — clean, dedupe and compare CSV/TSV in your browser</title>
+    <meta name="description" content="TidySheet is a free, no-signup, privacy-first tool to remove duplicate rows, clean messy text, and compare two CSV or TSV exports by a key column. Everything runs in your browser — nothing is uploaded." />
+    <meta name="robots" content="index, follow" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#app">Skip to main content</a>
+    <main id="app" class="page" aria-live="polite"></main>
+    <noscript>
+      <p>TidySheet needs JavaScript to run. The page is a small static app; please enable JavaScript or save the page and open it in a browser that supports it.</p>
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
