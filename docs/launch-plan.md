@@ -125,7 +125,38 @@ chapters. No spam, no mass posting; one per week.
 - Do not invent baseline numbers; record the first real measurement date once
   the tool is live.
 
-## 6. What "done" looks like for launch (gates)
+## 7. First 100 users plan (concrete, week-by-week)
+
+Goal: 100 distinct people who complete at least one operation, with feedback.
+
+Week 1 (after launch):
+- Post "Show HN: TidySheet" on Hacker News with a live demo link and a 60 s GIF.
+  Target: 20–50 visitors.
+- Post in r/excel and r/dataengineering with the leading-zeros tutorial link
+  (not a product pitch). Target: 10–30 visitors.
+
+Week 2:
+- Publish tutorial #1 (leading zeros) on Dev.to + a YouTube short.
+- Answer 5 relevant Stack Overflow questions with a link where the tool
+  genuinely solves the asked problem.
+
+Week 3:
+- Publish tutorial #2 (CSV diff false positives).
+- Submit to AlternativeTo and 2 awesome-lists via PR.
+- Post in 2 freelancer/ops communities (IndieHackers, a bookkeeping forum).
+
+Week 4:
+- Publish tutorial #3 (dedupe keep-rules).
+- Email 10 people who starred the repo or opened issues asking for feedback
+  (not a sales pitch).
+- Review analytics (if opt-in counter approved) and issue tracker.
+
+Metrics to track (aggregate only, no PII):
+- Page views, operations completed, error rate, returning visitors.
+- Issue tracker: questions, bugs, feature requests, willingness-to-pay poll.
+
+Rules: no spam, no fake reviews, no mass posting, no cold DMs. One post per
+community, value-first, link only when genuinely helpful.
 
 1. Manual QA checklist in docs/testing-report.md — all items checked.
 2. Live URL responds and the tool completes a dedupe + diff end-to-end.

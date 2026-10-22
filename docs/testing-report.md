@@ -72,8 +72,10 @@
 7. **Composite-key selection in the UI** relies on single-select dropdowns; true multi-select is a v1.1 UX improvement (engine already supports composite keys).
 8. **No saved rules / profiles** — every session starts fresh (by design for v1 privacy).
 
-## Verdict
+## 7. Verdict
 
-Core engine correctness is well covered (53 passing tests). The main residual risk is
-UI-level behavior on real browsers, which is captured in the manual QA checklist
-above and must be executed before any public link is shared.
+Core engine correctness is well covered (53 passing tests). Browser smoke tests
+passed in Chrome headless (page render, dedupe, diff, and clean workflows;
+no console errors; leading zeros preserved). Remaining manual checks (network
+panel, offline, keyboard, screen reader, responsive, Firefox, large-file) are
+documented in docs/manual-qa-checklist.md.

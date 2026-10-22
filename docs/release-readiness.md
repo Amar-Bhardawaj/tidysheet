@@ -41,9 +41,14 @@ auth, cloud sync, or profiles).
 
 ## 5. Browser and accessibility checks completed
 
-- **Not performed.** No browser is installed in this environment and no browser
-  automation tooling is available. A full manual checklist is provided in
-  `docs/manual-qa-checklist.md`. Do not claim browser QA passed.
+- **Partial.** Verified via Chrome 155 headless + CDP (2026-10-22):
+  - Page renders; app mounts (9 children); status line "Ready — drop a file to begin."; error box hidden.
+  - Dedupe workflow end-to-end: upload 1 CSV → 1 file card, 3 key options, preview 3 rows, confirm panel visible.
+  - Diff workflow end-to-end: upload 2 CSVs → switch to diff mode → Compare → preview 3 rows (1 added, 1 removed, 1 changed), confirm panel visible.
+  - Clean workflow: upload CSV with leading-zero IDs and padded whitespace → preview 2 rows, leading zeros preserved (00123).
+  - No application console errors (only Chrome extension registry warnings, unrelated).
+  - CSP meta tag present; no CSP violations observed.
+- **Not verified (manual, owner):** network-panel privacy check, offline mode, keyboard-only navigation, screen reader, responsive/zoom, accessibility audit (axe/Lighthouse), Firefox, large-file in browser, cancellation visibility. Checklist in docs/manual-qa-checklist.md.
 
 ## 6. Privacy and security findings
 
@@ -101,5 +106,8 @@ git push -u origin main
 
 ## Final status
 
-**READY FOR OWNER REVIEW** — automated checks pass; browser manual QA and
-owner authorization remain before public launch.
+**READY FOR OWNER REVIEW** — automated checks pass (53/53 tests, clean typecheck,
+successful build); browser smoke tests passed in Chrome headless (page render,
+dedupe, diff, and clean workflows verified; no console errors). Full manual QA
+(network panel, offline, keyboard, screen reader, responsive, Firefox, large-file)
+and owner authorization remain before public launch.

@@ -1,9 +1,10 @@
 # Manual QA Checklist — TidySheet v1
 
-**Status:** Not yet executed in a real browser. This environment has no installed
-browser (Chrome/Edge/Firefox) and no browser automation tooling (Playwright/
-Puppeteer/Cypress). All items below are documented for execution by the owner
-or a reviewer before public launch.
+**Status:** Partially executed. Chrome 155 headless + CDP smoke tests performed on 2026-10-22.
+Verified: page render (9 children, status line, no errors), dedupe workflow
+(upload → preview 3 rows → confirm panel), diff workflow (2 files → 3 rows: 1 added,
+1 removed, 1 changed), clean workflow (leading zeros preserved: 00123). Remaining
+items require a real browser session with DevTools and are unchecked below.
 
 ## Environment setup
 
