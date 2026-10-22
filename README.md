@@ -40,7 +40,7 @@ time. The build works fully offline once dependencies are installed.
 ## Limits (v1)
 
 - CSV and TSV only (Excel `.xlsx` is planned next).
-- 100 MB per file; 2,000,000 rows per table.
+- 100 MB per file; 1,000,000 rows per table.
 - Numbers and dates are compared as text on purpose — so `1.0` ≠ `1` and
   `2024-01-02` ≠ `02/01/2024`. This is deliberate: it prevents false
   matches on IDs, prices and envelope numbers.

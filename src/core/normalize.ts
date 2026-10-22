@@ -178,7 +178,7 @@ export const LIMITS = {
   /** Max bytes per uploaded file (100 MB). */
   MAX_FILE_BYTES: 100 * 1024 * 1024 as number,
   /** Max rows per table for compare/dedupe to stay responsive. */
-  MAX_ROWS: 2_000_000,
+  MAX_ROWS: 1_000_000,
   /** Max columns rendered in previews (data still loads if greater). */
   MAX_PREVIEW_COLUMNS: 30,
   /** Max preview rows shown in DOM (data itself is fully processed). */

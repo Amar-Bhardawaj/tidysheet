@@ -11,7 +11,7 @@
 - Key-based two-file diff (added/removed/changed/unchanged).
 - Duplicate-key warnings.
 - Cleaned file + removed-rows + change-report exports.
-- 100 MB / 2,000,000-row working limit.
+- 100 MB / 1,000,000-row working limit.
 - No account, no signup, no ads, no telemetry.
 
 Rationale: the free bar in this category is already high (Datablist's free CSV diff,
@@ -54,7 +54,7 @@ while not pretending to match xlCompare's professional depth.
 
 ## 5. Free-tier limitations (stated openly)
 
-- 100 MB per file, 2,000,000 rows.
+- 100 MB per file, 1,000,000 rows.
 - CSV/TSV only (no .xlsx in v1).
 - No saved profiles, no batch, no styled Excel reports.
 - No SLA / no support beyond the public issue tracker.

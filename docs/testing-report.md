@@ -42,7 +42,7 @@
 - CSP meta tag present in index.html with `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'none'`.
 - No network call carrying file content: worker only receives ArrayBuffer from the already-loaded File; no fetch in src (verified by grep).
 - No cookies / localStorage usage in src (verified by grep).
-- Hard caps: 100 MB per file, 2,000,000 rows, enforced before parse.
+- Hard caps: 100 MB per file, 1,000,000 rows, enforced before parse.
 - Binary sniff rejects NUL-byte content (xlsx/zip) with a clear message.
 - Error messages never echo absolute paths (only user-selected file names).
 
