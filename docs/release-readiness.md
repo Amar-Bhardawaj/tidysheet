@@ -48,7 +48,9 @@ auth, cloud sync, or profiles).
   - Clean workflow: upload CSV with leading-zero IDs and padded whitespace → preview 2 rows, leading zeros preserved (00123).
   - No application console errors (only Chrome extension registry warnings, unrelated).
   - CSP meta tag present; no CSP violations observed.
-- **Not verified (manual, owner):** network-panel privacy check, offline mode, keyboard-only navigation, screen reader, responsive/zoom, accessibility audit (axe/Lighthouse), Firefox, large-file in browser, cancellation visibility. Checklist in docs/manual-qa-checklist.md.
+- **Partially verified via Chrome headless + CDP (2026-10-22):** keyboard tab order (skip-link->upload-zone->chips->selects->inputs), focus indicator visible, no horizontal overflow at 320px or 200% zoom, large-file 10k rows in 613ms, cancellation (panel hides), binary file error shown, network privacy (localhost + data: URIs only, no external requests), offline processing works after worker warm-up (parse + dedupe preview completed offline).
+- **Not verified (manual, owner):** Firefox compatibility, screen-reader testing, accessibility audit (axe/Lighthouse), 50MB+ file in browser, export download trigger in headless. Checklist in docs/manual-qa-checklist.md.
+
 
 ## 6. Privacy and security findings
 
@@ -106,8 +108,4 @@ git push -u origin main
 
 ## Final status
 
-**READY FOR OWNER REVIEW** — automated checks pass (53/53 tests, clean typecheck,
-successful build); browser smoke tests passed in Chrome headless (page render,
-dedupe, diff, and clean workflows verified; no console errors). Full manual QA
-(network panel, offline, keyboard, screen reader, responsive, Firefox, large-file)
-and owner authorization remain before public launch.
+**READY FOR OWNER REVIEW** — automated checks pass (53/53 tests, clean typecheck, successful build); browser smoke tests passed in Chrome headless (page render, dedupe, diff, clean, keyboard, responsive, large-file, cancellation, binary handling, network privacy, offline processing). Full manual QA (Firefox, screen reader, axe/Lighthouse, 50MB+ file) and owner authorization remain before public launch.
