@@ -119,7 +119,7 @@ export function mountApp(root: HTMLElement): void {
   }
   function setBusy(busy: boolean): void {
     state.busy = busy;
-    setStatus(busy ? "Working…" : "Ready.");
+    if (busy) setStatus("Working…");
   }
 
   async function handleFiles(files: File[]): Promise<void> {
