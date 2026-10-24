@@ -64,6 +64,8 @@ export function mountApp(root: HTMLElement): void {
   };
 
   const statusLine = el("p", { id: "status-line", class: "status-line", text: "Ready — drop a file to begin." });
+  statusLine.setAttribute("role", "status");
+  statusLine.setAttribute("aria-live", "polite");
   const errorBox = el("div", { id: "error-box", class: "error-box" });
   errorBox.hidden = true;
   const uploadZone = createUploadZone({
@@ -82,6 +84,7 @@ export function mountApp(root: HTMLElement): void {
     onRunDiff: () => { void runDiff(); },
   });
   const previewContainer = el("div", { id: "preview", class: "preview-container" });
+  previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
   const confirmPanel = createConfirmPanel({
     onConfirm: () => { void applyDedupe(); },
     onCancel: () => {
@@ -90,9 +93,17 @@ export function mountApp(root: HTMLElement): void {
     onDownload: (label) => { void handleDownload(label); },
   });
 
+  const clearBtn = el("button", { type: "button", class: "btn btn-ghost", id: "clear-btn", text: "Clear" });
+  clearBtn.addEventListener("click", () => { void clearAll(); });
+
   root.appendChild(el("header", { class: "hero" },
-    el("h1", { text: "TidySheet" }),
-    el("p", { class: "hero-sub", text: "Clean, dedupe and compare CSV/TSV exports — on your computer, in this tab. Nothing is uploaded." })
+    el("div", { class: "hero-row" },
+      el("div", {},
+        el("h1", { text: "TidySheet" }),
+        el("p", { class: "hero-sub", text: "Clean, dedupe and compare CSV/TSV exports — on your computer, in this tab. Nothing is uploaded." })
+      ),
+      clearBtn
+    )
   ));
   root.appendChild(errorBox);
   root.appendChild(statusLine);
@@ -103,11 +114,22 @@ export function mountApp(root: HTMLElement): void {
   root.appendChild(confirmPanel);
   root.appendChild(el("footer", { class: "footer" },
     el("p", { text: "Privacy: files are processed entirely in this browser tab. No file content is sent anywhere. Closing the tab discards everything." }),
+    el("p", {},
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet", text: "GitHub", target: "_blank", rel: "noopener noreferrer" }),
+      el("span", { text: " · " }),
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet/issues", text: "Issues", target: "_blank", rel: "noopener noreferrer" }),
+      el("span", { text: " · " }),
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet/blob/main/LICENSE", text: "MIT License", target: "_blank", rel: "noopener noreferrer" })
+    ),
     el("p", { text: "v1 supports CSV and TSV (Excel .xlsx support is planned next). Files above 100 MB cannot be loaded in a browser." })
   ));
 
   function setStatus(text: string): void {
-    statusLine.textContent = text;
+    clear(statusLine);
+    if (state.busy) {
+      statusLine.appendChild(el("span", { class: "spinner" }));
+    }
+    statusLine.appendChild(document.createTextNode(text));
   }
   function showError(message: string): void {
     errorBox.textContent = message;
@@ -117,9 +139,38 @@ export function mountApp(root: HTMLElement): void {
     errorBox.hidden = true;
     errorBox.textContent = "";
   }
+  async function clearAll(): Promise<void> {
+    if (state.busy) return; // don't reset during processing
+    clearError();
+    clear(statusCards);
+    clear(previewContainer);
+    previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
+    state.tableB = null;
+    state.dedupePlan = null;
+    state.cleanTable = null;
+    state.cleanChanges = null;
+    state.diffResult = null;
+    state.lastDiffReportCsv = null;
+    state.lastDedupeRemovedCsv = null;
+    state.lastCleanedCsv = null;
+    state.lastDedupedCsv = null;
+    state.dedupeSettings = null;
+    state.cleanSettings = null;
+    state.diffSettings = null;
+    (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
+    const optPanel = optionPanel as HTMLElement & { populateColumns?: (t: Table | null, isDiff: boolean) => void };
+    optPanel.populateColumns?.(null, false);
+    setStatus("Ready — drop a file to begin.");
+  }
   function setBusy(busy: boolean): void {
     state.busy = busy;
     setStatus(busy ? "Working…" : "Ready.");
+    uploadZone.setAttribute("aria-busy", busy ? "true" : "false");
+    if (busy) {
+      uploadZone.classList.add("is-processing");
+    } else {
+      uploadZone.classList.remove("is-processing");
+    }
   }
 
   async function handleFiles(files: File[]): Promise<void> {
@@ -132,6 +183,7 @@ export function mountApp(root: HTMLElement): void {
     state.diffResult = null;
     (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
     clear(previewContainer);
+    previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
 
     const valid = files.filter((f) => f.size > 0);
     if (valid.length === 0) {

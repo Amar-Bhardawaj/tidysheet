@@ -4,7 +4,7 @@
   --bg: #f7f7f5;
   --card: #ffffff;
   --fg: #1a1a1a;
-  --muted: #5a5a5a;
+  --muted: #4a4a4a;
   --line: #e2e2de;
   --accent: #2a6f4a;
   --accent-2: #1f5337;
@@ -13,9 +13,26 @@
   --warn-fg: #5a4a00;
   --ok-bg: #eaf4ee;
   --focus: #2a6f4a;
-  --radius: 10px;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --radius-lg: 12px;
   --gap: 14px;
   --maxw: 1040px;
+  /* spacing scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  /* shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* typography */
+  --font-size-sm: 13px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 28px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -174,3 +191,52 @@ tr.status-cleaned td { background: #eaf0fa; }
 .footer p { margin: 4px 0; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Phase A additions */
+
+.hero-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) var(--space-3);
+}
+.btn-ghost:hover { color: var(--fg); border-color: var(--accent); }
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  padding: var(--space-6) var(--space-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.is-processing { opacity: 0.6; pointer-events: none; }
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: var(--space-2);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.status-line { display: flex; align-items: center; gap: var(--space-2); }
+
+.footer a { color: var(--accent); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+.footer .sep { color: var(--muted); margin: 0 var(--space-1); }

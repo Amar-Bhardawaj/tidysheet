@@ -43,10 +43,14 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
 
   const modeRow = el("div", { class: "mode-row" });
   const singleBtn = el("button", { class: "chip is-active", text: "One file: clean or dedupe", type: "button" });
+  singleBtn.setAttribute("aria-pressed", "true");
   const diffBtn = el("button", { class: "chip", text: "Two files: compare / diff", type: "button" });
+  diffBtn.setAttribute("aria-pressed", "false");
   singleBtn.addEventListener("click", () => {
     singleBtn.classList.add("is-active");
     diffBtn.classList.remove("is-active");
+    singleBtn.setAttribute("aria-pressed", "true");
+    diffBtn.setAttribute("aria-pressed", "false");
     singleSection.hidden = false;
     diffSection.hidden = true;
     cb.onMode("single");
@@ -54,6 +58,8 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
   diffBtn.addEventListener("click", () => {
     diffBtn.classList.add("is-active");
     singleBtn.classList.remove("is-active");
+    diffBtn.setAttribute("aria-pressed", "true");
+    singleBtn.setAttribute("aria-pressed", "false");
     singleSection.hidden = true;
     diffSection.hidden = false;
     cb.onMode("diff");
@@ -133,7 +139,7 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
   cleanCard.appendChild(el("label", { text: "Protect these columns from any cleaning (e.g. ID, phone, zip)" }));
   cleanCard.appendChild(protectInput);
 
-  const cleanBtn = el("button", { type: "button", class: "btn btn-primary", text: "Preview cleaning" });
+  const cleanBtn = el("button", { type: "button", class: "btn", text: "Preview cleaning" });
   cleanCard.appendChild(cleanBtn);
   singleSection.appendChild(cleanCard);
   root.appendChild(singleSection);
@@ -237,7 +243,11 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
     if (isDiff) {
       clear(keySelectA);
       clear(keySelectB);
-      if (!table) return;
+      if (!table) {
+        keySelectA.appendChild(el("option", { value: "", text: "Load a file first" }));
+        keySelectB.appendChild(el("option", { value: "", text: "Load a file first" }));
+        return;
+      }
       table.headers.forEach((h, i) => {
         const opt = el("option", { value: String(i), text: `${h} (col ${i + 1})` });
         keySelectA.appendChild(opt);
@@ -254,7 +264,10 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
       clear(keySelect);
       const fullOpt = el("option", { value: "", text: "Full row (all columns)" });
       keySelect.appendChild(fullOpt);
-      if (!table) return;
+      if (!table) {
+        keySelect.appendChild(el("option", { value: "", text: "Load a file first", disabled: "true" }));
+        return;
+      }
       table.headers.forEach((h, i) => {
         keySelect.appendChild(el("option", { value: String(i), text: `${h} (col ${i + 1})` }));
       });
