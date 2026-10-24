@@ -75,7 +75,11 @@ export function mountApp(root: HTMLElement): void {
   });
   const statusCards = el("div", { id: "status-cards", class: "status-cards" });
   const optionPanel = createOptionPanel({
-    onMode: (m) => { state.mode = m; },
+    onMode: (m) => { 
+      state.mode = m; 
+      const optPanel = optionPanel as HTMLElement & { populateColumns?: (t: Table | null, isDiff: boolean) => void };
+      optPanel.populateColumns?.(state.tableA, m === "diff");
+    },
     onDedupe: (s) => { state.dedupeSettings = s; },
     onClean: (s) => { state.cleanSettings = s; },
     onDiff: (s) => { state.diffSettings = s; },
