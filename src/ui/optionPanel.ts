@@ -102,7 +102,7 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
   caseLabel.appendChild(el("span", { text: " Case-sensitive keys" }));
   dedupeCard.appendChild(caseLabel);
 
-  const dedupeBtn = el("button", { type: "button", class: "btn btn-primary", text: "Preview duplicates" });
+  const dedupeBtn = el("button", { type: "button", class: "btn btn-primary", text: "Preview duplicates", disabled: "true" });
   dedupeCard.appendChild(dedupeBtn);
   singleSection.appendChild(dedupeCard);
 
@@ -139,7 +139,7 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
   cleanCard.appendChild(el("label", { text: "Protect these columns from any cleaning (e.g. ID, phone, zip)" }));
   cleanCard.appendChild(protectInput);
 
-  const cleanBtn = el("button", { type: "button", class: "btn", text: "Preview cleaning" });
+  const cleanBtn = el("button", { type: "button", class: "btn", text: "Preview cleaning", disabled: "true" });
   cleanCard.appendChild(cleanBtn);
   singleSection.appendChild(cleanCard);
   root.appendChild(singleSection);
@@ -176,7 +176,7 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
   });
   diffSection.appendChild(compositeHint);
 
-  const diffBtnRun = el("button", { type: "button", class: "btn btn-primary", text: "Compare files" });
+  const diffBtnRun = el("button", { type: "button", class: "btn btn-primary", text: "Compare files", disabled: "true" });
   diffSection.appendChild(diffBtnRun);
   root.appendChild(diffSection);
 
@@ -246,8 +246,10 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
       if (!table) {
         keySelectA.appendChild(el("option", { value: "", text: "Load a file first" }));
         keySelectB.appendChild(el("option", { value: "", text: "Load a file first" }));
+        diffBtnRun.disabled = true;
         return;
       }
+      diffBtnRun.disabled = false;
       table.headers.forEach((h, i) => {
         const opt = el("option", { value: String(i), text: `${h} (col ${i + 1})` });
         keySelectA.appendChild(opt);
@@ -266,8 +268,12 @@ export function createOptionPanel(cb: OptionCallbacks): HTMLElement {
       keySelect.appendChild(fullOpt);
       if (!table) {
         keySelect.appendChild(el("option", { value: "", text: "Load a file first", disabled: "true" }));
+        dedupeBtn.disabled = true;
+        cleanBtn.disabled = true;
         return;
       }
+      dedupeBtn.disabled = false;
+      cleanBtn.disabled = false;
       table.headers.forEach((h, i) => {
         keySelect.appendChild(el("option", { value: String(i), text: `${h} (col ${i + 1})` }));
       });

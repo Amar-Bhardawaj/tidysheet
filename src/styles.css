@@ -240,3 +240,86 @@ tr.status-cleaned td { background: #eaf0fa; }
 .footer a { color: var(--accent); text-decoration: none; }
 .footer a:hover { text-decoration: underline; }
 .footer .sep { color: var(--muted); margin: 0 var(--space-1); }
+
+/* Phase B additions */
+
+/* Disabled button state */
+.btn:disabled, .btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn:disabled:hover, .btn[disabled]:hover { border-color: var(--line); }
+
+/* Toast notification */
+.toast-container {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 360px;
+}
+.toast {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--shadow-md);
+  animation: toast-in 0.2s ease-out;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.toast-success { background: var(--ok-bg); color: var(--accent-2); border: 1px solid var(--accent); }
+.toast-warning { background: var(--warn-bg); color: var(--warn-fg); border: 1px solid #c9a400; }
+.toast-error { background: #fbeaea; color: #7a1a1a; border: 1px solid var(--danger); }
+@media (prefers-color-scheme: dark) {
+  .toast-error { background: #2a1515; color: #f0b0b0; }
+}
+.toast-dismiss {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  margin-left: auto;
+  color: inherit;
+  opacity: 0.6;
+}
+.toast-dismiss:hover { opacity: 1; }
+@keyframes toast-in {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(10px); opacity: 0; }
+}
+.toast.removing { animation: toast-out 0.2s ease-in forwards; }
+
+/* Empty select placeholder */
+.select option:disabled { color: var(--muted); font-style: italic; }
+
+/* Indeterminate progress bar */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: var(--space-2) 0;
+}
+.progress-bar-indeterminate {
+  width: 40%;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: progress-slide 1.2s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}

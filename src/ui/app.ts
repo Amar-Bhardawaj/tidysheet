@@ -4,7 +4,7 @@
  * about processing state.
  */
 
-import { el, clear, downloadText } from "./components.js";
+import { el, clear, downloadText, showToast } from "./components.js";
 import { createUploadZone, fileStatusCard } from "./uploadZone.js";
 import { createOptionPanel } from "./optionPanel.js";
 import { renderPreview } from "./previewTable.js";
@@ -188,6 +188,7 @@ export function mountApp(root: HTMLElement): void {
     const valid = files.filter((f) => f.size > 0);
     if (valid.length === 0) {
       showError("Those files appear to be empty.");
+      showToast("Those files appear to be empty.", "error");
       return;
     }
     if (valid.length > 2) {
@@ -209,6 +210,7 @@ export function mountApp(root: HTMLElement): void {
         const result = await workerParse(bytes, f.name, "auto");
         if (!result.table) {
           showError(result.message ?? "Could not read that file.");
+          showToast(result.message ?? "Could not read that file.", "error");
           setBusy(false);
           return;
         }
@@ -233,6 +235,9 @@ export function mountApp(root: HTMLElement): void {
       setBusy(false);
       if (state.tableA) {
         setStatus(state.tableB ? "Two files loaded — switch to “Two files: compare / diff” to compare them." : "File loaded — choose an operation above.");
+        // Move focus to the option panel for keyboard users
+        const firstFocusable = optionPanel.querySelector("select, button, input") as HTMLElement | null;
+        if (firstFocusable) firstFocusable.focus();
       }
     }
   }
@@ -281,6 +286,7 @@ export function mountApp(root: HTMLElement): void {
       state.lastDedupedCsv = await workerTableCsv(deduped);
       state.lastDedupeRemovedCsv = await workerDedupeRemovedCsv(state.tableA, state.dedupePlan.dropIndices);
       downloadText("tidysheet-deduped.csv", state.lastDedupedCsv);
+      showToast(`Downloaded tidysheet-deduped.csv (${deduped.rows.length} rows)`, "success");
       setStatus(`Downloaded tidysheet-deduped.csv (${deduped.rows.length} rows). Removed-rows report also available.`);
       (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
     } catch (err) {
@@ -379,12 +385,14 @@ export function mountApp(root: HTMLElement): void {
       if (label === "Download cleaned file" && state.cleanTable) {
         if (!state.lastCleanedCsv) state.lastCleanedCsv = await workerTableCsv(state.cleanTable);
         downloadText("tidysheet-cleaned.csv", state.lastCleanedCsv);
+        showToast("Downloaded tidysheet-cleaned.csv", "success");
       } else if (label === "Download cleaned file" && state.dedupePlan && state.tableA) {
         if (!state.lastDedupedCsv) {
           const t = await workerDedupeApply(state.tableA, state.dedupePlan);
           state.lastDedupedCsv = await workerTableCsv(t);
         }
         downloadText("tidysheet-deduped.csv", state.lastDedupedCsv);
+        showToast("Downloaded tidysheet-deduped.csv", "success");
       } else if (label === "Download change report" && state.tableA && state.tableB && state.diffSettings) {
         if (!state.lastDiffReportCsv) {
           state.lastDiffReportCsv = await workerDiffReport(state.tableA, state.tableB, state.diffSettings, {
@@ -397,6 +405,7 @@ export function mountApp(root: HTMLElement): void {
           });
         }
         downloadText("tidysheet-diff-report.csv", state.lastDiffReportCsv);
+        showToast("Downloaded tidysheet-diff-report.csv", "success");
       } else if (label === "Download cleaned file") {
         // fallback: no-op
       }
