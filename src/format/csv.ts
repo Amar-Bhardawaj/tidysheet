@@ -8,6 +8,7 @@ import Papa from "papaparse";
 import type { Delimiter, EncodingName, Table } from "../core/types.js";
 import {
   containsNul,
+  looksBinary,
   resolveDuplicateHeaders,
   sniffEncoding,
 } from "../core/normalize.js";
@@ -50,6 +51,12 @@ export function decodeBytes(bytes: Uint8Array): string {
     throw new ValidationError("EMPTY_FILE", ERROR_MESSAGES.EMPTY_FILE);
   }
   if (containsNul(bytes)) {
+    throw new ValidationError(
+      "BINARY_FILE",
+      ERROR_MESSAGES.BINARY_FILE
+    );
+  }
+  if (looksBinary(bytes)) {
     throw new ValidationError(
       "BINARY_FILE",
       ERROR_MESSAGES.BINARY_FILE

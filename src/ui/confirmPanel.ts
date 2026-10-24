@@ -20,7 +20,7 @@ export function createConfirmPanel(actions: ConfirmActions): HTMLElement {
   summary.appendChild(body);
 
   const buttonRow = el("div", { class: "btn-row" });
-  const confirmBtn = el("button", { type: "button", class: "btn btn-danger", text: "Confirm and apply" });
+  const confirmBtn = el("button", { type: "button", class: "btn btn-primary", text: "Confirm and apply" });
   const cancelBtn = el("button", { type: "button", class: "btn", text: "Cancel" });
   buttonRow.appendChild(confirmBtn);
   buttonRow.appendChild(cancelBtn);

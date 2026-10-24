@@ -4,7 +4,7 @@
  * about processing state.
  */
 
-import { el, clear, downloadText } from "./components.js";
+import { el, clear, downloadText, showToast } from "./components.js";
 import { createUploadZone, fileStatusCard } from "./uploadZone.js";
 import { createOptionPanel } from "./optionPanel.js";
 import { renderPreview } from "./previewTable.js";
@@ -64,6 +64,8 @@ export function mountApp(root: HTMLElement): void {
   };
 
   const statusLine = el("p", { id: "status-line", class: "status-line", text: "Ready — drop a file to begin." });
+  statusLine.setAttribute("role", "status");
+  statusLine.setAttribute("aria-live", "polite");
   const errorBox = el("div", { id: "error-box", class: "error-box" });
   errorBox.hidden = true;
   const uploadZone = createUploadZone({
@@ -73,7 +75,11 @@ export function mountApp(root: HTMLElement): void {
   });
   const statusCards = el("div", { id: "status-cards", class: "status-cards" });
   const optionPanel = createOptionPanel({
-    onMode: (m) => { state.mode = m; },
+    onMode: (m) => { 
+      state.mode = m; 
+      const optPanel = optionPanel as HTMLElement & { populateColumns?: (t: Table | null, isDiff: boolean) => void };
+      optPanel.populateColumns?.(state.tableA, m === "diff");
+    },
     onDedupe: (s) => { state.dedupeSettings = s; },
     onClean: (s) => { state.cleanSettings = s; },
     onDiff: (s) => { state.diffSettings = s; },
@@ -82,6 +88,7 @@ export function mountApp(root: HTMLElement): void {
     onRunDiff: () => { void runDiff(); },
   });
   const previewContainer = el("div", { id: "preview", class: "preview-container" });
+  previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
   const confirmPanel = createConfirmPanel({
     onConfirm: () => { void applyDedupe(); },
     onCancel: () => {
@@ -90,9 +97,17 @@ export function mountApp(root: HTMLElement): void {
     onDownload: (label) => { void handleDownload(label); },
   });
 
+  const clearBtn = el("button", { type: "button", class: "btn btn-ghost", id: "clear-btn", text: "Clear" });
+  clearBtn.addEventListener("click", () => { void clearAll(); });
+
   root.appendChild(el("header", { class: "hero" },
-    el("h1", { text: "TidySheet" }),
-    el("p", { class: "hero-sub", text: "Clean, dedupe and compare CSV/TSV exports — on your computer, in this tab. Nothing is uploaded." })
+    el("div", { class: "hero-row" },
+      el("div", {},
+        el("h1", { text: "TidySheet" }),
+        el("p", { class: "hero-sub", text: "Clean, dedupe and compare CSV/TSV exports — on your computer, in this tab. Nothing is uploaded." })
+      ),
+      clearBtn
+    )
   ));
   root.appendChild(errorBox);
   root.appendChild(statusLine);
@@ -103,11 +118,22 @@ export function mountApp(root: HTMLElement): void {
   root.appendChild(confirmPanel);
   root.appendChild(el("footer", { class: "footer" },
     el("p", { text: "Privacy: files are processed entirely in this browser tab. No file content is sent anywhere. Closing the tab discards everything." }),
+    el("p", {},
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet", text: "GitHub", target: "_blank", rel: "noopener noreferrer" }),
+      el("span", { text: " · " }),
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet/issues", text: "Issues", target: "_blank", rel: "noopener noreferrer" }),
+      el("span", { text: " · " }),
+      el("a", { href: "https://github.com/Amar-Bhardawaj/tidysheet/blob/main/LICENSE", text: "MIT License", target: "_blank", rel: "noopener noreferrer" })
+    ),
     el("p", { text: "v1 supports CSV and TSV (Excel .xlsx support is planned next). Files above 100 MB cannot be loaded in a browser." })
   ));
 
   function setStatus(text: string): void {
-    statusLine.textContent = text;
+    clear(statusLine);
+    if (state.busy) {
+      statusLine.appendChild(el("span", { class: "spinner" }));
+    }
+    statusLine.appendChild(document.createTextNode(text));
   }
   function showError(message: string): void {
     errorBox.textContent = message;
@@ -117,9 +143,38 @@ export function mountApp(root: HTMLElement): void {
     errorBox.hidden = true;
     errorBox.textContent = "";
   }
+  async function clearAll(): Promise<void> {
+    if (state.busy) return; // don't reset during processing
+    clearError();
+    clear(statusCards);
+    clear(previewContainer);
+    previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
+    state.tableB = null;
+    state.dedupePlan = null;
+    state.cleanTable = null;
+    state.cleanChanges = null;
+    state.diffResult = null;
+    state.lastDiffReportCsv = null;
+    state.lastDedupeRemovedCsv = null;
+    state.lastCleanedCsv = null;
+    state.lastDedupedCsv = null;
+    state.dedupeSettings = null;
+    state.cleanSettings = null;
+    state.diffSettings = null;
+    (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
+    const optPanel = optionPanel as HTMLElement & { populateColumns?: (t: Table | null, isDiff: boolean) => void };
+    optPanel.populateColumns?.(null, false);
+    setStatus("Ready — drop a file to begin.");
+  }
   function setBusy(busy: boolean): void {
     state.busy = busy;
     setStatus(busy ? "Working…" : "Ready.");
+    uploadZone.setAttribute("aria-busy", busy ? "true" : "false");
+    if (busy) {
+      uploadZone.classList.add("is-processing");
+    } else {
+      uploadZone.classList.remove("is-processing");
+    }
   }
 
   async function handleFiles(files: File[]): Promise<void> {
@@ -132,10 +187,12 @@ export function mountApp(root: HTMLElement): void {
     state.diffResult = null;
     (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
     clear(previewContainer);
+    previewContainer.appendChild(el("p", { class: "empty-state", text: "No file loaded yet. Drop a CSV or TSV file above to get started." }));
 
     const valid = files.filter((f) => f.size > 0);
     if (valid.length === 0) {
       showError("Those files appear to be empty.");
+      showToast("Those files appear to be empty.", "error");
       return;
     }
     if (valid.length > 2) {
@@ -157,6 +214,7 @@ export function mountApp(root: HTMLElement): void {
         const result = await workerParse(bytes, f.name, "auto");
         if (!result.table) {
           showError(result.message ?? "Could not read that file.");
+          showToast(result.message ?? "Could not read that file.", "error");
           setBusy(false);
           return;
         }
@@ -181,6 +239,9 @@ export function mountApp(root: HTMLElement): void {
       setBusy(false);
       if (state.tableA) {
         setStatus(state.tableB ? "Two files loaded — switch to “Two files: compare / diff” to compare them." : "File loaded — choose an operation above.");
+        // Move focus to the option panel for keyboard users
+        const firstFocusable = optionPanel.querySelector("select, button, input") as HTMLElement | null;
+        if (firstFocusable) firstFocusable.focus();
       }
     }
   }
@@ -229,6 +290,7 @@ export function mountApp(root: HTMLElement): void {
       state.lastDedupedCsv = await workerTableCsv(deduped);
       state.lastDedupeRemovedCsv = await workerDedupeRemovedCsv(state.tableA, state.dedupePlan.dropIndices);
       downloadText("tidysheet-deduped.csv", state.lastDedupedCsv);
+      showToast(`Downloaded tidysheet-deduped.csv (${deduped.rows.length} rows)`, "success");
       setStatus(`Downloaded tidysheet-deduped.csv (${deduped.rows.length} rows). Removed-rows report also available.`);
       (confirmPanel as HTMLElement & { hide?: () => void }).hide?.();
     } catch (err) {
@@ -327,12 +389,14 @@ export function mountApp(root: HTMLElement): void {
       if (label === "Download cleaned file" && state.cleanTable) {
         if (!state.lastCleanedCsv) state.lastCleanedCsv = await workerTableCsv(state.cleanTable);
         downloadText("tidysheet-cleaned.csv", state.lastCleanedCsv);
+        showToast("Downloaded tidysheet-cleaned.csv", "success");
       } else if (label === "Download cleaned file" && state.dedupePlan && state.tableA) {
         if (!state.lastDedupedCsv) {
           const t = await workerDedupeApply(state.tableA, state.dedupePlan);
           state.lastDedupedCsv = await workerTableCsv(t);
         }
         downloadText("tidysheet-deduped.csv", state.lastDedupedCsv);
+        showToast("Downloaded tidysheet-deduped.csv", "success");
       } else if (label === "Download change report" && state.tableA && state.tableB && state.diffSettings) {
         if (!state.lastDiffReportCsv) {
           state.lastDiffReportCsv = await workerDiffReport(state.tableA, state.tableB, state.diffSettings, {
@@ -345,6 +409,7 @@ export function mountApp(root: HTMLElement): void {
           });
         }
         downloadText("tidysheet-diff-report.csv", state.lastDiffReportCsv);
+        showToast("Downloaded tidysheet-diff-report.csv", "success");
       } else if (label === "Download cleaned file") {
         // fallback: no-op
       }

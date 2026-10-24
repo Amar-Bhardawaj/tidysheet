@@ -20,9 +20,10 @@ export function createUploadZone(cb: UploadCallbacks): HTMLElement {
 
   const zone = el("div", {
     class: "upload-zone",
-    role: "button",
+    role: "region",
+    "aria-label": "File upload area. Drag and drop CSV or TSV files here, or click to browse.",
+    "aria-describedby": "error-box",
     tabindex: "0",
-    "aria-label": "Choose one or two CSV/TSV files (drag and drop or press Enter)",
   });
   zone.appendChild(el("p", { class: "upload-title", text: "Drop your CSV/TSV file(s) here" }));
   zone.appendChild(el("p", { class: "upload-sub", text: "or click to browse — one file for cleaning/dedupe, two for a diff" }));

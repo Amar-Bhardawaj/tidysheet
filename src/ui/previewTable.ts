@@ -39,9 +39,12 @@ export function renderPreview(
   const table = el("table", { class: "preview" });
   table.setAttribute("aria-label", "Preview of proposed changes");
 
+  const caption = el("caption", { class: "sr-only", text: "Preview of proposed changes. Columns: Status, Row, followed by data columns. Rows are color-coded by status." });
+  table.appendChild(caption);
+
   const thead = el("thead");
   const hr = el("tr");
-  hr.appendChild(el("th", { scope: "col", text: "Status" }));
+  hr.appendChild(el("th", { scope: "col", text: "Status", class: "sticky-col" }));
   hr.appendChild(el("th", { scope: "col", text: "Row" }));
   for (const col of shownColumns) {
     hr.appendChild(el("th", { scope: "col", text: col.header }));
@@ -54,7 +57,7 @@ export function renderPreview(
     const tr = el("tr", { class: `status-${row.status}` });
     const label =
       row.status === "unchanged" ? "unchanged" : row.status;
-    tr.appendChild(el("td", { text: label }));
+    tr.appendChild(el("td", { text: label, class: "sticky-col" }));
     tr.appendChild(
       el("td", {
         text: row.rowNumber && row.rowNumberB ? `${row.rowNumber} → ${row.rowNumberB}` : String(row.rowNumber ?? ""),
@@ -66,7 +69,9 @@ export function renderPreview(
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
-  container.appendChild(table);
+  const scrollWrapper = el("div", { class: "table-scroll" });
+  scrollWrapper.appendChild(table);
+  container.appendChild(scrollWrapper);
 
   const extra = meta.totalRows - shownRows.length;
   if (extra > 0) {

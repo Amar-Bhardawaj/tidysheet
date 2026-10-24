@@ -51,6 +51,28 @@ export function formatBytes(n: number): string {
   return `${Math.round((n / (1024 * 1024)) * 10) / 10} MB`;
 }
 
+/** Show a toast notification. Auto-dismisses after `duration` ms. */
+export function showToast(message: string, type: "success" | "warning" | "error" = "success", duration = 3000): void {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = el("div", { id: "toast-container", class: "toast-container", "aria-live": "polite" });
+    document.body.appendChild(container);
+  }
+  const toast = el("div", { class: `toast toast-${type}`, role: "alert" });
+  toast.appendChild(document.createTextNode(message));
+  const dismiss = el("button", { class: "toast-dismiss", type: "button", "aria-label": "Dismiss notification", text: "×" });
+  dismiss.addEventListener("click", () => removeToast(toast));
+  toast.appendChild(dismiss);
+  container.appendChild(toast);
+  setTimeout(() => removeToast(toast), duration);
+}
+
+function removeToast(toast: HTMLElement): void {
+  if (toast.classList.contains("removing")) return;
+  toast.classList.add("removing");
+  setTimeout(() => { toast.remove(); }, 200);
+}
+
 /** Trigger a client-side file download (no network involved). */
 export function downloadText(fileName: string, text: string): void {
   const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
